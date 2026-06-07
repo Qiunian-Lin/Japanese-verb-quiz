@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日语动词变化练习题</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1a2e;
+    --red: #c0392b;
+    --gold: #b8860b;
+    --paper: #fdf6e3;
+    --paper2: #f5edd6;
+    --border: #c8b89a;
+    --correct: #27ae60;
+    --wrong: #c0392b;
+    --accent: #2c3e6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    font-family: 'Noto Sans SC', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      repeating-linear-gradient(transparent, transparent 31px, var(--border) 31px, var(--border) 32px);
+    background-attachment: fixed;
+  }
+
+  .header {
+    background: var(--accent);
+    color: #fff;
+    padding: 24px 32px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .header h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    height: 8px;
+    margin: 10px auto 0;
+    max-width: 500px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: #f0c040;
+    border-radius: 20px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  .stats span { font-weight: 500; }
+  .stats .correct-count { color: #7effa0; }
+  .stats .wrong-count { color: #ff9898; }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    border-left: 4px solid var(--gold);
+    padding-left: 12px;
+    margin: 36px 0 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .question-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    box-shadow: 2px 3px 0 var(--border);
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .question-card.answered-correct {
+    border-color: var(--correct);
+    box-shadow: 2px 3px 0 var(--correct);
+    background: #f0fff4;
+  }
+
+  .question-card.answered-wrong {
+    border-color: var(--wrong);
+    box-shadow: 2px 3px 0 var(--wrong);
+    background: #fff5f5;
+  }
+
+  .q-number {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 6px;
+    font-family: monospace;
+  }
+
+  .q-text {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  .q-text .jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+
+  .q-text .blank {
+    display: inline-block;
+    border-bottom: 2px solid var(--gold);
+    min-width: 60px;
+    color: var(--gold);
+    font-style: italic;
+    padding: 0 4px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .answer-input {
+    flex: 1;
+    min-width: 140px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 12px;
+    font-size: 1rem;
+    font-family: 'Noto Serif JP', serif;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .answer-input:focus { border-color: var(--accent); }
+
+  .answer-input:disabled {
+    background: #f0f0f0;
+    cursor: not-allowed;
+  }
+
+  .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .btn-check {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-check:hover { background: #1a2550; }
+
+  .btn-show {
+    background: var(--border);
+    color: var(--ink);
+    font-size: 0.82rem;
+  }
+
+  .btn-show:hover { background: #bbb; }
+
+  .feedback {
+    margin-top: 10px;
+    font-size: 0.92rem;
+    padding: 8px 12px;
+    border-radius: 3px;
+    display: none;
+  }
+
+  .feedback.correct {
+    display: block;
+    background: #d4edda;
+    color: #155724;
+    border-left: 3px solid var(--correct);
+  }
+
+  .feedback.wrong {
+    display: block;
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 3px solid var(--wrong);
+  }
+
+  .feedback .answer-reveal {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--correct);
+  }
+
+  .tip {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .result-banner {
+    display: none;
+    background: var(--accent);
+    color: #fff;
+    text-align: center;
+    padding: 40px 24px;
+    border-radius: 6px;
+    margin-top: 40px;
+  }
+
+  .result-banner h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .result-banner .score {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #f0c040;
+  }
+
+  .btn-reset {
+    margin-top: 20px;
+    padding: 12px 32px;
+    background: #f0c040;
+    color: var(--ink);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 500;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+    font-weight: 500;
+  }
+
+  .tag-godan { background: #e8f4fd; color: #2980b9; }
+  .tag-ichidan { background: #eafaf1; color: #1e8449; }
+  .tag-ka { background: #fdf2e9; color: #ca6f1e; }
+  .tag-sa { background: #f9ebea; color: #c0392b; }
+  .tag-classify { background: #f4ecf7; color: #7d3c98; }
+  .tag-te { background: #fef9e7; color: #b7950b; }
+  .tag-exist { background: #eaf2ff; color: #2471a3; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>日语动词变化综合练习</h1>
+  <div class="stats">
+    <span>共 <strong id="total-count">0</strong> 题</span>
+    <span class="correct-count">✓ 正确 <strong id="correct-count">0</strong></span>
+    <span class="wrong-count">✗ 错误 <strong id="wrong-count">0</strong></span>
+    <span>已作答 <strong id="done-count">0</strong></span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+</div>
+
+<div class="container" id="quiz-container"></div>
+
+<script>
+// ===================== QUESTION DATA =====================
+const sections = [
+  {
+    title: "一、动词分类判断（五段·上一段·下一段·カ变·サ变）",
+    tag: "tag-classify",
+    tagLabel: "分类",
+    questions: [
+      { q: "判断动词类型：<span class='jp'>読む</span>", a: ["五段"], hint: "词尾む，五段动词" },
+      { q: "判断动词类型：<span class='jp'>遊ぶ</span>", a: ["五段"], hint: "词尾ぶ，五段动词" },
+      { q: "判断动词类型：<span class='jp'>死ぬ</span>", a: ["五段"], hint: "词尾ぬ，五段动词" },
+      { q: "判断动词类型：<span class='jp'>立つ</span>", a: ["五段"], hint: "词尾つ，五段动词" },
+      { q: "判断动词类型：<span class='jp'>話す</span>", a: ["五段"], hint: "词尾す，五段动词" },
+      { q: "判断动词类型：<span class='jp'>泳ぐ</span>", a: ["五段"], hint: "词尾ぐ，五段动词" },
+      { q: "判断动词类型：<span class='jp'>書く</span>", a: ["五段"], hint: "词尾く，五段动词" },
+      { q: "判断动词类型：<span class='jp'>買う</span>", a: ["五段"], hint: "词尾う，五段动词" },
+      { q: "判断动词类型：<span class='jp'>起きる</span>", a: ["上一段"], hint: "上一段：词尾る，前面是i段音き" },
+      { q: "判断动词类型：<span class='jp'>行く</span>", a: ["五段"], hint: "词尾く，五段动词" },
+      { q: "判断动词类型：<span class='jp'>集める</span>", a: ["下一段"], hint: "下一段：词尾る，前面是e段音め" },
+      { q: "判断动词类型：<span class='jp'>寝る</span>", a: ["下一段"], hint: "下一段：词尾る，前面是e段音ね" },
+      { q: "判断动词类型：<span class='jp'>掛かる</span>", a: ["五段"], hint: "词尾る，前面是a段音か→五段" },
+      { q: "判断动词类型：<span class='jp'>来る</span>", a: ["カ变", "か变"], hint: "来る是カ变（不规则）" },
+      { q: "判断动词类型：<span class='jp'>する</span>", a: ["サ变", "さ变"], hint: "する是サ变（不规则）" },
+      { q: "判断动词类型：<span class='jp'>旅行する</span>", a: ["サ变", "さ变"], hint: "汉语词+する，サ变" },
+      { q: "判断动词类型：<span class='jp'>居る</span>（いる）", a: ["上一段"], hint: "上一段：词尾る，前面是i段い" },
+      { q: "判断动词类型：<span class='jp'>売る</span>", a: ["五段"], hint: "词尾る，前面是u段う→五段（例外）" },
+      { q: "判断动词类型：<span class='jp'>得る</span>（える）", a: ["下一段"], hint: "下一段：前面是e段え" },
+      { q: "判断动词类型：<span class='jp'>折る</span>", a: ["五段"], hint: "词尾る，前面是o段お→五段（例外）" },
+      { q: "判断动词类型：<span class='jp'>有る</span>（ある）", a: ["五段"], hint: "ある是五段动词（例外）" },
+    ]
+  },
+  {
+    title: "二、ます形变化（礼貌体）",
+    tag: "tag-godan",
+    tagLabel: "ます形",
+    questions: [
+      { q: "<span class='jp'>読む</span> → ます形", a: ["読みます"], hint: "五段：词尾む→み，加ます" },
+      { q: "<span class='jp'>書く</span> → ます形", a: ["書きます"], hint: "五段：词尾く→き，加ます" },
+      { q: "<span class='jp'>泳ぐ</span> → ます形", a: ["泳ぎます"], hint: "五段：词尾ぐ→ぎ，加ます" },
+      { q: "<span class='jp'>話す</span> → ます形", a: ["話します"], hint: "五段：词尾す→し，加ます" },
+      { q: "<span class='jp'>立つ</span> → ます形", a: ["立ちます"], hint: "五段：词尾つ→ち，加ます" },
+      { q: "<span class='jp'>死ぬ</span> → ます形", a: ["死にます"], hint: "五段：词尾ぬ→に，加ます" },
+      { q: "<span class='jp'>遊ぶ</span> → ます形", a: ["遊びます"], hint: "五段：词尾ぶ→び，加ます" },
+      { q: "<span class='jp'>買う</span> → ます形", a: ["買います"], hint: "五段：词尾う→い，加ます" },
+      { q: "<span class='jp'>帰る</span> → ます形", a: ["帰ります"], hint: "五段：词尾る→り，加ます" },
+      { q: "<span class='jp'>起きる</span> → ます形", a: ["起きます"], hint: "上一段：去掉る，加ます" },
+      { q: "<span class='jp'>食べる</span> → ます形", a: ["食べます"], hint: "下一段：去掉る，加ます" },
+      { q: "<span class='jp'>集める</span> → ます形", a: ["集めます"], hint: "下一段：去掉る，加ます" },
+      { q: "<span class='jp'>来る</span> → ます形", a: ["来ます", "きます"], hint: "カ变：来る→き+ます" },
+      { q: "<span class='jp'>する</span> → ます形", a: ["します"], hint: "サ变：する→し+ます" },
+      { q: "<span class='jp'>旅行する</span> → ます形", a: ["旅行します"], hint: "サ变：する→し+ます" },
+    ]
+  },
+  {
+    title: "三、ない形变化（否定形）",
+    tag: "tag-godan",
+    tagLabel: "ない形",
+    questions: [
+      { q: "<span class='jp'>読む</span> → ない形", a: ["読まない"], hint: "五段：词尾む→ま，加ない" },
+      { q: "<span class='jp'>書く</span> → ない形", a: ["書かない"], hint: "五段：词尾く→か，加ない" },
+      { q: "<span class='jp'>泳ぐ</span> → ない形", a: ["泳がない"], hint: "五段：词尾ぐ→が，加ない" },
+      { q: "<span class='jp'>話す</span> → ない形", a: ["話さない"], hint: "五段：词尾す→さ，加ない" },
+      { q: "<span class='jp'>立つ</span> → ない形", a: ["立たない"], hint: "五段：词尾つ→た，加ない" },
+      { q: "<span class='jp'>死ぬ</span> → ない形", a: ["死なない"], hint: "五段：词尾ぬ→な，加ない" },
+      { q: "<span class='jp'>遊ぶ</span> → ない形", a: ["遊ばない"], hint: "五段：词尾ぶ→ば，加ない" },
+      { q: "<span class='jp'>買う</span> → ない形", a: ["買わない"], hint: "五段：词尾う→わ，加ない（注意！）" },
+      { q: "<span class='jp'>帰る</span> → ない形", a: ["帰らない"], hint: "五段：词尾る→ら，加ない" },
+      { q: "<span class='jp'>起きる</span> → ない形", a: ["起きない"], hint: "上一段：去掉る，加ない" },
+      { q: "<span class='jp'>食べる</span> → ない形", a: ["食べない"], hint: "下一段：去掉る，加ない" },
+      { q: "<span class='jp'>来る</span> → ない形", a: ["来ない", "こない"], hint: "カ变：こ+ない" },
+      { q: "<span class='jp'>する</span> → ない形", a: ["しない"], hint: "サ变：し+ない" },
+      { q: "<span class='jp'>ある</span> → ない形", a: ["ない"], hint: "ある的特殊否定：直接用ない！" },
+    ]
+  },
+  {
+    title: "四、て形变化",
+    tag: "tag-te",
+    tagLabel: "て形",
+    questions: [
+      { q: "<span class='jp'>書く</span> → て形", a: ["書いて"], hint: "五段く→いて（音变）" },
+      { q: "<span class='jp'>泳ぐ</span> → て形", a: ["泳いで"], hint: "五段ぐ→いで（浊音）" },
+      { q: "<span class='jp'>話す</span> → て形", a: ["話して"], hint: "五段す→して" },
+      { q: "<span class='jp'>立つ</span> → て形", a: ["立って"], hint: "五段つ→って（促音便）" },
+      { q: "<span class='jp'>死ぬ</span> → て形", a: ["死んで"], hint: "五段ぬ→んで（撥音便）" },
+      { q: "<span class='jp'>遊ぶ</span> → て形", a: ["遊んで"], hint: "五段ぶ→んで（撥音便）" },
+      { q: "<span class='jp'>読む</span> → て形", a: ["読んで"], hint: "五段む→んで（撥音便）" },
+      { q: "<span class='jp'>買う</span> → て形", a: ["買って"], hint: "五段う→って（促音便）" },
+      { q: "<span class='jp'>帰る</span> → て形", a: ["帰って"], hint: "五段る→って（促音便）" },
+      { q: "<span class='jp'>行く</span> → て形", a: ["行って"], hint: "行く的特殊て形：行って（不是行いて）" },
+      { q: "<span class='jp'>食べる</span> → て形", a: ["食べて"], hint: "下一段：去る，加て" },
+      { q: "<span class='jp'>起きる</span> → て形", a: ["起きて"], hint: "上一段：去る，加て" },
+      { q: "<span class='jp'>来る</span> → て形", a: ["来て", "きて"], hint: "カ变：き+て" },
+      { q: "<span class='jp'>する</span> → て形", a: ["して"], hint: "サ变：し+て" },
+    ]
+  },
+  {
+    title: "五、た形变化（过去形）",
+    tag: "tag-te",
+    tagLabel: "た形",
+    questions: [
+      { q: "<span class='jp'>書く</span> → た形（过去）", a: ["書いた"], hint: "五段く→いた" },
+      { q: "<span class='jp'>泳ぐ</span> → た形", a: ["泳いだ"], hint: "五段ぐ→いだ（浊音）" },
+      { q: "<span class='jp'>話す</span> → た形", a: ["話した"], hint: "五段す→した" },
+      { q: "<span class='jp'>立つ</span> → た形", a: ["立った"], hint: "五段つ→った" },
+      { q: "<span class='jp'>死ぬ</span> → た形", a: ["死んだ"], hint: "五段ぬ→んだ" },
+      { q: "<span class='jp'>遊ぶ</span> → た形", a: ["遊んだ"], hint: "五段ぶ→んだ" },
+      { q: "<span class='jp'>読む</span> → た形", a: ["読んだ"], hint: "五段む→んだ" },
+      { q: "<span class='jp'>買う</span> → た形", a: ["買った"], hint: "五段う→った" },
+      { q: "<span class='jp'>行く</span> → た形", a: ["行った"], hint: "行く特殊：行った" },
+      { q: "<span class='jp'>食べる</span> → た形", a: ["食べた"], hint: "下一段：去る，加た" },
+      { q: "<span class='jp'>起きる</span> → た形", a: ["起きた"], hint: "上一段：去る，加た" },
+      { q: "<span class='jp'>来る</span> → た形", a: ["来た", "きた"], hint: "カ变：き+た" },
+      { q: "<span class='jp'>する</span> → た形", a: ["した"], hint: "サ变：し+た" },
+    ]
+  },
+  {
+    title: "六、ば形变化（假定形）",
+    tag: "tag-godan",
+    tagLabel: "ば形",
+    questions: [
+      { q: "<span class='jp'>読む</span> → ば形（假定）", a: ["読めば"], hint: "五段：词尾む→め，加ば" },
+      { q: "<span class='jp'>書く</span> → ば形", a: ["書けば"], hint: "五段：词尾く→け，加ば" },
+      { q: "<span class='jp'>話す</span> → ば形", a: ["話せば"], hint: "五段：词尾す→せ，加ば" },
+      { q: "<span class='jp'>立つ</span> → ば形", a: ["立てば"], hint: "五段：词尾つ→て，加ば" },
+      { q: "<span class='jp'>遊ぶ</span> → ば形", a: ["遊べば"], hint: "五段：词尾ぶ→べ，加ば" },
+      { q: "<span class='jp'>帰る</span> → ば形", a: ["帰れば"], hint: "五段：词尾る→れ，加ば" },
+      { q: "<span class='jp'>食べる</span> → ば形", a: ["食べれば"], hint: "下一段：去る，加れば" },
+      { q: "<span class='jp'>起きる</span> → ば形", a: ["起きれば"], hint: "上一段：去る，加れば" },
+      { q: "<span class='jp'>来る</span> → ば形", a: ["来れば", "くれば"], hint: "カ变：く+れば" },
+      { q: "<span class='jp'>する</span> → ば形", a: ["すれば"], hint: "サ变：す+れば" },
+    ]
+  },
+  {
+    title: "七、意志形/劝诱形（よう形）",
+    tag: "tag-godan",
+    tagLabel: "よう形",
+    questions: [
+      { q: "<span class='jp'>読む</span> → 意志形（よう）", a: ["読もう"], hint: "五段：词尾む→も，加う" },
+      { q: "<span class='jp'>書く</span> → 意志形", a: ["書こう"], hint: "五段：词尾く→こ，加う" },
+      { q: "<span class='jp'>遊ぶ</span> → 意志形", a: ["遊ぼう"], hint: "五段：词尾ぶ→ぼ，加う" },
+      { q: "<span class='jp'>帰る</span> → 意志形", a: ["帰ろう"], hint: "五段：词尾る→ろ，加う" },
+      { q: "<span class='jp'>食べる</span> → 意志形", a: ["食べよう"], hint: "下一段：去る，加よう" },
+      { q: "<span class='jp'>起きる</span> → 意志形", a: ["起きよう"], hint: "上一段：去る，加よう" },
+      { q: "<span class='jp'>来る</span> → 意志形", a: ["来よう", "こよう"], hint: "カ变：こ+よう" },
+      { q: "<span class='jp'>する</span> → 意志形", a: ["しよう"], hint: "サ变：し+よう" },
+    ]
+  },
+  {
+    title: "八、命令形",
+    tag: "tag-godan",
+    tagLabel: "命令形",
+    questions: [
+      { q: "<span class='jp'>読む</span> → 命令形", a: ["読め"], hint: "五段：词尾む→め" },
+      { q: "<span class='jp'>書く</span> → 命令形", a: ["書け"], hint: "五段：词尾く→け" },
+      { q: "<span class='jp'>話す</span> → 命令形", a: ["話せ"], hint: "五段：词尾す→せ" },
+      { q: "<span class='jp'>食べる</span> → 命令形", a: ["食べろ"], hint: "下一段：去る，加ろ" },
+      { q: "<span class='jp'>起きる</span> → 命令形", a: ["起きろ"], hint: "上一段：去る，加ろ" },
+      { q: "<span class='jp'>来る</span> → 命令形", a: ["来い", "こい"], hint: "カ变命令形：こい" },
+      { q: "<span class='jp'>する</span> → 命令形", a: ["しろ", "せよ"], hint: "サ变命令形：しろ/せよ" },
+    ]
+  },
+  {
+    title: "九、て形构造（～ている / ～てある等）",
+    tag: "tag-te",
+    tagLabel: "て形应用",
+    questions: [
+      { q: "用「<span class='jp'>食べる</span>」造句：现在正在吃饭（进行时）", a: ["食べている", "食べています"], hint: "V+ている表进行/存在状态" },
+      { q: "「<span class='jp'>窓が開けてある</span>」是什么意思？（填中文）", a: ["窗户被开着", "窗户开着（某人开的）", "窗被打开着"], hint: "てある：有意识行为的结果状态存在" },
+      { q: "用「<span class='jp'>書く</span>」表示提前写好（放置）：", a: ["書いておく"], hint: "ておく：提前做好，放置" },
+      { q: "用「<span class='jp'>食べる</span>」表示吃完（结束/完毕）：", a: ["食べてしまう", "食べてしまいます"], hint: "てしまう：完成/遗憾地做完" },
+      { q: "用「<span class='jp'>来る</span>」表示来并做……（て来る）的意思是：（填中文）", a: ["来着做", "去做后回来", "做完来"], hint: "てくる：从某处来做，或逐渐变化趋向说话人" },
+      { q: "用「<span class='jp'>読む</span>」请求别人：「请你读一下」（敬体）", a: ["読んでください"], hint: "てください：请做……" },
+      { q: "<span class='jp'>猫は机の下にいます</span>，请问いる在这里表示（填中文）：", a: ["存在", "在", "（生物）存在"], hint: "いる：生物存在" },
+      { q: "<span class='jp'>本は机の上にあります</span>，请问ある在这里表示（填中文）：", a: ["存在", "在", "（非生物）存在"], hint: "ある：非生物存在" },
+      { q: "「<span class='jp'>てもらう</span>」的意思是（填中文）：", a: ["得到（别人为我做）", "请别人做"], hint: "てもらう：得到别人为自己做某事" },
+      { q: "「<span class='jp'>てあげる</span>」的意思是（填中文）：", a: ["给别人做（恩惠）", "为别人做"], hint: "てあげる：为对方做，给予恩惠" },
+    ]
+  },
+  {
+    title: "十、接尾语变化综合（か・た・ば・て等接续）",
+    tag: "tag-godan",
+    tagLabel: "综合",
+    questions: [
+      { q: "<span class='jp'>走る</span> → 否定（ない形）", a: ["走らない"], hint: "五段る→ら+ない" },
+      { q: "<span class='jp'>知る</span> → ます形", a: ["知ります"], hint: "五段る→り+ます" },
+      { q: "<span class='jp'>入る</span>（はいる）→ て形", a: ["入って"], hint: "五段（五段例外）る→って" },
+      { q: "<span class='jp'>切る</span>（きる）→ ない形（注意：是五段）", a: ["切らない"], hint: "切る是五段（例外），词尾る→ら" },
+      { q: "<span class='jp'>滑べる</span>（すべる）→ ます形（注意：是五段）", a: ["滑べります"], hint: "滑べる是五段（例外），る→り+ます" },
+      { q: "<span class='jp'>食べる</span>的ない形是：", a: ["食べない"], hint: "下一段：去る，加ない" },
+      { q: "<span class='jp'>見る</span>（みる）→ て形", a: ["見て"], hint: "上一段：去る，加て" },
+      { q: "<span class='jp'>寝る</span> → ば形", a: ["寝れば"], hint: "下一段：去る，加れば" },
+      { q: "<span class='jp'>来る</span>的ない形是：", a: ["来ない", "こない"], hint: "カ变：こ+ない" },
+      { q: "<span class='jp'>旅行する</span>的て形是：", a: ["旅行して"], hint: "サ变：し+て" },
+    ]
+  },
+  {
+    title: "十一、否定礼貌体（ません）",
+    tag: "tag-godan",
+    tagLabel: "ません",
+    questions: [
+      { q: "<span class='jp'>読む</span> → ません形（礼貌否定）", a: ["読みません"], hint: "ます形词干+ません" },
+      { q: "<span class='jp'>食べる</span> → ません形", a: ["食べません"], hint: "ます形词干+ません" },
+      { q: "<span class='jp'>来る</span> → ません形", a: ["来ません", "きません"], hint: "き+ません" },
+      { q: "<span class='jp'>する</span> → ません形", a: ["しません"], hint: "し+ません" },
+      { q: "<span class='jp'>帰る</span> → 过去否定礼貌体（～ませんでした）", a: ["帰りませんでした"], hint: "帰り+ませんでした" },
+      { q: "<span class='jp'>書く</span> → 过去礼貌体（～ました）", a: ["書きました"], hint: "書き+ました" },
+    ]
+  },
+  {
+    title: "十二、综合应用题",
+    tag: "tag-classify",
+    tagLabel: "综合应用",
+    questions: [
+      { q: "「<span class='jp'>有る</span>（ある）」的特殊性在于：它的ない形不是「<span class='jp'>あらない</span>」而是_____", a: ["ない"], hint: "ある的否定是特殊形ない" },
+      { q: "五段动词て形，词尾是ぬ・ぶ・む时，发生的音便叫做（填中文）：", a: ["撥音便"], hint: "ぬ・ぶ・む→ん+で，撥音便" },
+      { q: "五段动词て形，词尾是つ・う・る时，发生的音便叫做（填中文）：", a: ["促音便"], hint: "つ・う・る→っ+て，促音便" },
+      { q: "五段动词て形，词尾是く时，变为（填假名）：", a: ["いて"], hint: "く→いて（イ音便）" },
+      { q: "五段动词て形，词尾是ぐ时，变为（填假名）：", a: ["いで"], hint: "ぐ→いで（浊音化）" },
+      { q: "<span class='jp'>行く</span>的て形特殊在于（填假名）：", a: ["行って"], hint: "行く特殊：不遵循く→いて规则，而是行って" },
+      { q: "上一段和下一段动词，ます形变化规则是（填中文）：", a: ["去掉る加ます", "词尾去る加ます"], hint: "上下一段：词尾去る，直接加ます" },
+      { q: "判断：<span class='jp'>折る・売る・有る・走る・知る・切る・入る・帰る・滑べる・要る</span> 这些以る结尾的词是哪类动词？（填中文）", a: ["五段动词", "五段"], hint: "这些以る结尾但前面是a/u/o段，均为五段（例外）" },
+      { q: "「<span class='jp'>食べてしまいました</span>」中，てしまう表示（填中文）：", a: ["完成", "遗憾地做完", "做完了"], hint: "てしまう：完成，或带有遗憾意味" },
+      { q: "<span class='jp'>てから</span>的意思是（填中文）：", a: ["做完……之后", "……之后", "做了……后"], hint: "てから：做完某事之后" },
+    ]
+  }
+];
+
+// ===================== RENDER =====================
+let totalQuestions = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let doneCount = 0;
+
+function normalize(str) {
+  return str.trim()
+    .replace(/\s+/g, '')
+    .replace(/[（）]/g, match => match === '（' ? '(' : ')')
+    .toLowerCase();
+}
+
+function checkAnswer(userAns, correctList) {
+  const u = normalize(userAns);
+  return correctList.some(a => normalize(a) === u);
+}
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  let qNum = 0;
+
+  sections.forEach(section => {
+    const secDiv = document.createElement('div');
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'section-title';
+    titleEl.textContent = section.title;
+    secDiv.appendChild(titleEl);
+
+    section.questions.forEach(q => {
+      qNum++;
+      totalQuestions++;
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.id = 'q' + qNum;
+
+      card.innerHTML = `
+        <div class="q-number">Q${qNum} <span class="tag ${section.tag}">${section.tagLabel}</span></div>
+        <div class="q-text">${q.q}</div>
+        <div class="input-row">
+          <input type="text" class="answer-input" placeholder="输入答案（日文/中文均可）" data-num="${qNum}">
+          <button class="btn btn-check" onclick="submitAnswer(${qNum})">确认</button>
+          <button class="btn btn-show" onclick="showAnswer(${qNum})">显示答案</button>
+        </div>
+        <div class="feedback" id="fb${qNum}"></div>
+        <div class="tip" id="tip${qNum}" style="display:none">💡 ${q.hint}</div>
+      `;
+
+      // Store answer data
+      card.dataset.answers = JSON.stringify(q.a);
+      card.dataset.hint = q.hint;
+
+      // Enter key support
+      const input = card.querySelector('.answer-input');
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitAnswer(qNum);
+      });
+
+      secDiv.appendChild(card);
+    });
+
+    container.appendChild(secDiv);
+  });
+
+  // Add result banner
+  const banner = document.createElement('div');
+  banner.className = 'result-banner';
+  banner.id = 'result-banner';
+  banner.innerHTML = `
+    <h2>🎉 全部完成！</h2>
+    <div class="score" id="final-score">0/0</div>
+    <p style="margin-top:12px;opacity:0.85">继续加油，熟能生巧！</p>
+    <button class="btn-reset" onclick="resetQuiz()">重新练习</button>
+  `;
+  container.appendChild(banner);
+
+  updateStats();
+}
+
+window.submitAnswer = function(num) {
+  const card = document.getElementById('q' + num);
+  const input = card.querySelector('.answer-input');
+  const fb = document.getElementById('fb' + num);
+  const tip = document.getElementById('tip' + num);
+
+  if (input.disabled) return;
+
+  const userAns = input.value;
+  if (!userAns.trim()) { input.focus(); return; }
+
+  const answers = JSON.parse(card.dataset.answers);
+  const isCorrect = checkAnswer(userAns, answers);
+
+  input.disabled = true;
+  card.querySelector('.btn-check').disabled = true;
+  card.querySelector('.btn-show').disabled = true;
+  tip.style.display = 'block';
+  doneCount++;
+
+  if (isCorrect) {
+    correctCount++;
+    card.classList.add('answered-correct');
+    fb.className = 'feedback correct';
+    fb.innerHTML = `✓ 正确！答案：<span class="answer-reveal">${answers[0]}</span>`;
+  } else {
+    wrongCount++;
+    card.classList.add('answered-wrong');
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `✗ 错误。您的答案：「${userAns}」<br>正确答案：<span class="answer-reveal">${answers.join(' / ')}</span>`;
+  }
+
+  updateStats();
+  if (doneCount === totalQuestions) showResult();
+};
+
+window.showAnswer = function(num) {
+  const card = document.getElementById('q' + num);
+  const input = card.querySelector('.answer-input');
+  const fb = document.getElementById('fb' + num);
+  const tip = document.getElementById('tip' + num);
+
+  if (input.disabled) return;
+
+  const answers = JSON.parse(card.dataset.answers);
+  input.disabled = true;
+  card.querySelector('.btn-check').disabled = true;
+  card.querySelector('.btn-show').disabled = true;
+  tip.style.display = 'block';
+  doneCount++;
+  wrongCount++; // counts as missed
+
+  card.classList.add('answered-wrong');
+  fb.className = 'feedback wrong';
+  fb.innerHTML = `📖 答案：<span class="answer-reveal">${answers.join(' / ')}</span>`;
+
+  updateStats();
+  if (doneCount === totalQuestions) showResult();
+};
+
+function updateStats() {
+  document.getElementById('total-count').textContent = totalQuestions;
+  document.getElementById('correct-count').textContent = correctCount;
+  document.getElementById('wrong-count').textContent = wrongCount;
+  document.getElementById('done-count').textContent = doneCount;
+  const pct = totalQuestions ? (doneCount / totalQuestions * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function showResult() {
+  const banner = document.getElementById('result-banner');
+  banner.style.display = 'block';
+  document.getElementById('final-score').textContent = `${correctCount} / ${totalQuestions}`;
+  banner.scrollIntoView({ behavior: 'smooth' });
+}
+
+window.resetQuiz = function() {
+  correctCount = 0; wrongCount = 0; doneCount = 0; totalQuestions = 0;
+  document.getElementById('quiz-container').innerHTML = '';
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+buildQuiz();
+</script>
+</body>
+</html>
